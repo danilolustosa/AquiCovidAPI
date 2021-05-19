@@ -6,12 +6,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using AquiCovidAPI.Interface;
+using Microsoft.Extensions.Configuration;
 
 namespace AquiCovidAPI.Repository
 {
-    public class PessoaRepository : IPessoaRepository
+    public class PessoaRepository : BaseRespository, IPessoaRepository
     {
-        public string _connectionString = "Server=DANILO\\SQLEXPRESS;Database=AquiCovid;Trusted_Connection=True;";
+        public PessoaRepository(IConfiguration configuration) : base(configuration) { }
 
         public List<Pessoa> Listar()
         {
@@ -36,6 +37,54 @@ namespace AquiCovidAPI.Repository
             SqlConnection conn = new SqlConnection(_connectionString);
             conn.Open();
             return conn.QueryFirstOrDefault<Pessoa>(query, new { Id });
+        }
+
+        public Pessoa ObterPorCpf(string CPF)
+        {
+            string query = @"SELECT [Id]
+                                  ,[Nome]
+                                  ,[CPF]
+                              FROM [dbo].[Pessoa]
+                              WHERE [CPF] = @CPF";
+
+            SqlConnection conn = new SqlConnection(_connectionString);
+            conn.Open();
+            return conn.QueryFirstOrDefault<Pessoa>(query, new { CPF });
+        }
+
+        public void Inserir(Pessoa pessoa)
+        {
+            string query = @"INSERT INTO [dbo].[Pessoa]
+                                   ([Nome]
+                                   ,[CPF])
+                             VALUES
+                                   (@Nome
+                                   ,@CPF)";
+
+            SqlConnection conn = new SqlConnection(_connectionString);
+            conn.Open();
+            conn.Execute(query, pessoa);
+        }
+
+        public void Atualizar(Pessoa pessoa)
+        {
+            string query = @"UPDATE [dbo].[Pessoa]
+                               SET [Nome] = @Nome
+                                  ,[CPF] = @CPF
+                             WHERE Id = @Id";
+
+            SqlConnection conn = new SqlConnection(_connectionString);
+            conn.Open();
+            conn.Execute(query, pessoa);
+        }
+
+        public void Deletar(int Id)
+        {
+            string query = @"DELETE FROM Pessoa WHERE Id = @Id";
+
+            SqlConnection conn = new SqlConnection(_connectionString);
+            conn.Open();
+            conn.Execute(query, new { Id });
         }
     }
 }

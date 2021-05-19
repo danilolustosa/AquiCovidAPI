@@ -10,5 +10,9 @@ namespace AquiCovidAPI.Interface
     {
         List<Pessoa> Listar();
         Pessoa Obter(int Id);
+        void Inserir(Pessoa pessoa);
+        Pessoa ObterPorCpf(string CPF);
+        void Atualizar(Pessoa pessoa);
+        void Deletar(int Id);
     }
 }
